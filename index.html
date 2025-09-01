@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pilihan Role — Veloria</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+	
+	.top-menu {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50; /* Pastikan menu di atas elemen lain */
+}
+.menu-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #e5f2ff;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+.menu-toggle:hover span {
+  background-color: var(--primary);
+}
+.menu-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #0b1220;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 10px 0;
+  width: 150px;
+}
+.menu-dropdown.show {
+  display: block;
+}
+.menu-dropdown a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #e5f2ff;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.menu-dropdown a:hover {
+  background-color: rgba(56, 189, 248, 0.1);
+  color: var(--primary);
+}
+
+	
+  :root{
+    --primary:#38bdf8;
+    --accent:#facc15;
+    --danger:#ef4444;
+    --bg1:#0b1220;
+    --bg2:#060a14;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:#e5f2ff;
+    background: radial-gradient(1200px 700px at 50% -10%, #152338 0%, #0a1324 35%, #050a15 100%);
+    display:flex; flex-direction:column; align-items:center; gap:28px;
+    padding:32px 16px 72px;
+    overflow-x:hidden;
+  }
+
+  /* Background image + overlay */
+  .bg{
+    position:fixed; inset:0; z-index:-2;
+    background-position:center 35%;
+    background-size:cover;
+    filter:saturate(1) brightness(.85);
+    transform:scale(1.02);
+  }
+  .bg::after{
+    content:"";
+    position:absolute; inset:0; z-index:1;
+    background:linear-gradient(180deg, rgba(5,10,21,.35) 0%, rgba(5,10,21,.65) 40%, rgba(5,10,21,.9) 100%);
+    backdrop-filter: blur(1px);
+  }
+
+  header h1{
+    margin:0;
+    font-weight:700;
+    font-size:clamp(22px, 3.6vw, 34px);
+    letter-spacing:.3px;
+    text-align:center;
+    color:var(--accent);
+    text-shadow:0 0 12px rgba(250,204,21,.45), 0 0 26px rgba(56,189,248,.35);
+  }
+  header p{
+    margin:.25rem 0 0;
+    opacity:.9; text-align:center; font-size:.95rem
+  }
+
+  /* Grid cards */
+  .roles{
+    width:min(1000px, 100%);
+    display:grid; gap:18px;
+    grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+  }
+  .card{
+    position:relative; overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:18px; padding:18px 16px 16px;
+    backdrop-filter: blur(6px);
+    box-shadow:0 10px 28px rgba(0,0,0,.25);
+    cursor:pointer;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .card:hover{ transform:translateY(-8px); box-shadow:0 16px 40px rgba(0,0,0,.35); border-color:rgba(56,189,248,.55) }
+  .card::before{
+    content:""; position:absolute; inset:-2px; z-index:-1;
+    background: conic-gradient(from 180deg at 50% 50%, rgba(56,189,248,.0), rgba(56,189,248,.55), rgba(250,204,21,.4), rgba(56,189,248,.0));
+    filter: blur(18px); opacity:.25; transition:opacity .3s ease;
+  }
+  .card:hover::before{opacity:.55}
+
+  .thumb{
+    width:58px; height:58px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.6);
+    background:#0d1629 center/cover no-repeat;
+    box-shadow:0 0 0 3px rgba(56,189,248,.25);
+  }
+  .row{display:flex; align-items:center; gap:14px}
+  .title{margin:0; font-size:1.05rem; color:var(--accent)}
+  .desc{margin:.25rem 0 0; font-size:.9rem; opacity:.9}
+
+  .tag{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:10px; padding:6px 10px; font-size:.78rem; border-radius:999px;
+    background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.35); color:#dff5ff;
+  }
+
+  /* Modal */
+  .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:30; }
+  .modal.show{ display:grid; }
+  .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.7); backdrop-filter: blur(2px); }
+
+  .sheet{
+    position:relative; z-index:1;
+    width:min(520px, 92vw); max-height:86vh; overflow:hidden;
+    background:linear-gradient(180deg, #0c1426, #0a1222);
+    border:1px solid rgba(56,189,248,.45);
+    border-radius:18px; box-shadow:0 24px 64px rgba(0,0,0,.5);
+    animation:pop .28s ease;
+    display:flex; flex-direction:column;
+  }
+  @keyframes pop{ from{ transform:scale(.9); opacity:0 } to{ transform:scale(1); opacity:1 } }
+
+  .sheet-header{
+    position:relative; overflow:hidden;
+    aspect-ratio: 16/9; background:#0d1629 center/cover no-repeat;
+  }
+  .sheet-header::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(5,10,21,.05) 0%, rgba(5,10,21,.55) 65%, rgba(5,10,21,.85) 100%);
+  }
+  .sheet-body{ padding:16px 18px 96px; overflow:auto }
+  .sheet-body h2{ margin:0 0 6px; color:var(--primary) }
+  .sheet-body p{ margin:.35rem 0; color:#d8e7ff; line-height:1.55 }
+  .bullets{ margin:.6rem 0 .2rem; padding-left:18px }
+  .bullets li{ margin:.2rem 0 }
+
+  .sheet-actions{
+    position:sticky; bottom:0; display:flex; gap:10px; padding:12px; background:linear-gradient(180deg, rgba(12,20,38,0), rgba(12,20,38,.95) 35%, rgba(12,20,38,.98));
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .btn{
+    flex:1; padding:12px 14px; border:0; border-radius:12px; font-weight:700; cursor:pointer;
+    transition:transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+  .btn.primary{ background: linear-gradient(90deg, #22c55e, #16a34a); color:white; box-shadow:0 0 0 2px rgba(34,197,94,.25) inset }
+  .btn.primary:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(22,163,74,.35) }
+  .btn.ghost{ background:rgba(239,68,68,.15); color:#ffe8e8; border:1px solid rgba(239,68,68,.45) }
+  .btn.ghost:hover{ opacity:.95; transform:translateY(-1px) }
+
+  .close-x{
+    position:absolute; top:10px; right:10px;
+    width:34px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.35);
+    background:rgba(0,0,0,.35); color:#fff; font-weight:700; cursor:pointer;
+    display:grid; place-items:center;
+  }
+  .close-x:hover{ background:rgba(0,0,0,.5) }
+
+  /* Watermark dengan efek berjalan */
+  .watermark{
+    position:fixed; left:50%; bottom:12px; transform:translateX(-50%);
+    font-weight:700; font-size:14px; letter-spacing:.4px; user-select:none; z-index:50;
+    background:linear-gradient(90deg,#ff6ec4,#7873f5,#4ade80,#facc15,#ff6ec4);
+    background-size:300% 300%;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:0 0 8px rgba(0,0,0,.55);
+    opacity:0; animation:fadeIn 1.2s ease forwards .2s, move 6s linear infinite;
+  }
+  @keyframes move{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  @keyframes fadeIn{from{opacity:0; transform:translateX(-50%) translateY(12px)} to{opacity:1; transform:translateX(-50%) translateY(0)}}
+
+  /* Small helper badges */
+  .badge{
+    position:absolute; top:10px; right:10px;
+    padding:4px 10px; font-size:.72rem; border-radius:999px;
+    background:rgba(250,204,21,.16); border:1px solid rgba(250,204,21,.45); color:#fff;
+  }
+
+/* Tambahan supaya halaman bisa scroll */
+html, body {
+  min-height: 100%;
+  height: auto;          /* jangan fixed 100% */
+  overflow-y: auto;      /* paksa scroll kalau konten panjang */
+}
+
+/* Tambahan supaya modal bisa scroll */
+.sheet-body {
+  max-height: 60vh;      /* batasi tinggi modal */
+  overflow-y: auto;      /* aktifkan scroll di dalam modal */
+}
+
+</style>
+</head>
+<body>
+	<nav class="top-menu" id="topMenu">
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="https://chat.whatsapp.com/Fv0zIW3x6yiKDd0dKMKJDD" target="_blank" rel="noopener noreferrer">Link WhatsApp</a>
+    <a href="https://discord.gg/wywAV9FA5J" target="_blank" rel="noopener noreferrer">Link Discord</a>
+    <a href="https://discord.gg/BJSSbACG" target="_blank" rel="noopener noreferrer">Contact Us</a>
+     <a href="URL_GROUP_ANDA" target="_blank" rel="noopener noreferrer">Link Host</a>
+  </div>
+</nav>
+
+
+<!-- BACKGROUND IMAGE (set via JS config) -->
+<div class="bg" id="bg"></div>
+
+<header>
+  <h1> Pilih Role Anda</h1>
+  <p>Pilih role favoritmu. Klik untuk melihat detail & membeli via WhatsApp.</p>
+</header>
+
+<main class="roles">
+  <!-- Role: Mod -->
+  <article class="card" onclick="openRole('Role Admin','Admin','Command utama: <b>mod</b>, <b>track</b>.','Cocok untuk menjaga keamanan & ketertiban server.','mod')">
+    <span class="badge">Security</span>
+    <div class="row">
+      <div class="thumb" id="thumb-mod"></div>
+      <div>
+        <h3 class="title">Role Admin</h3>
+        <p class="desc">Command: mod, track</p>
+        <p class="desc">SLOT 2</p>
+      </div>
+    </div>
+    <div class="tag"> Anti-cheat & Tracking</div>
+    <div class="tag"> No unli</div>
+    <div class="tag"> Daily DL : 200DL</div>
+  </article>
+
+  <!-- Role: Staff -->
+  <article class="card" onclick="openRole('Role Staff','Staff','Fokus ke <b>informasi</b> dan <b>support</b> pemain.','Membantu komunitas, menjawab pertanyaan, dan menjalankan event ringan.','staff')">
+    <span class="badge">Support</span>
+    <div class="row">
+      <div class="thumb" id="thumb-staff"></div>
+      <div>
+        <h3 class="title">Role Staff</h3>
+        <p class="desc">Info & Support</p>
+        <p class="desc">SLOT 3</p>
+      </div>
+    </div>
+    <div class="tag"> 70% akses</div>
+    <div class="tag"> Daily DL : 999DL</div>
+  </article>
+
+
+
+
+
+  <!-- Role: Co Owner -->
+  <article class="card" onclick="openRole('Role Co Owner','Co Owner','Akses <b>Co Owner</b> — hampir semua command terbuka.','Pas untuk partner tepercaya yang mengelola server bersama.','co')">
+    <span class="badge">Co Owner</span>
+    <div class="row">
+      <div class="thumb" id="thumb-co"></div>
+      <div>
+        <h3 class="title">Role Co Owner</h3>
+        <p class="desc">Akses Co Owner</p>
+        <p class="desc">Harga 300k</p>
+      </div>
+    </div>
+    <div class="tag"> 99% Access</div>
+    <div class="tag"> Harga 300k</div>
+  </article>
+</main>
+
+
+<!-- MODAL / SHEET -->
+<section class="modal" id="modal">
+  <div class="scrim" onclick="closeModal()"></div>
+  <div class="sheet">
+    <button class="close-x" aria-label="Tutup" onclick="closeModal()"></button>
+    <div class="sheet-header" id="sheetHeader"></div>
+    <div class="sheet-body">
+      <h2 id="mTitle">Role</h2>
+      <p id="mLine1"></p>
+      <ul class="bullets" id="mBullets"></ul>
+      <p id="mLine2"></p>
+    </div>
+    <div class="sheet-actions">
+      <a id="buyLink" class="btn primary" target="_blank" rel="noopener">Beli Sekarang via WhatsApp</a>
+      <button class="btn ghost" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+</section>
+
+<!-- WATERMARK -->
+<div class="watermark">Website by VELORIA ps.</div>
+
+<script>
+	
+	function toggleMenu() {
+  const menu = document.getElementById('menuDropdown');
+  menu.classList.toggle('show');
+}
+// Tutup menu jika mengklik di luar area menu
+window.onclick = function(event) {
+  if (!event.target.matches('.menu-toggle') && !event.target.matches('.menu-toggle span')) {
+    const dropdowns = document.getElementsByClassName('menu-dropdown');
+    for (let i = 0; i < dropdowns.length; i++) {
+      const openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+	
+/* =========================
+   KONFIGURASI MUDAH EDIT
+   ========================= */
+const IMG_URL = "https://i.postimg.cc/138CLCWg/images-1.png"; // <- ganti ke path gambarmu
+const WA_NUMBER = "6285713374867";    // <- ganti ke nomor WA-mu (tanpa +)
+const WA_TEXT   = (role) => `Halo%20kak,%20saya%20ingin%20beli%20${encodeURIComponent(role)}%20di%20server%20VELORIA.`;
+
+/* Pasang background + thumbnail dari gambar kamu */
+document.getElementById("bg").style.backgroundImage = `url('${IMG_URL}')`;
+["mod","staff","co"].forEach(id=>{
+  const el = document.getElementById(`thumb-${id}`);
+  if(el) el.style.backgroundImage = `url('${IMG_URL}')`;
+});
+
+/* Buka modal dengan konten dinamis */
+function openRole(title, roleKey, line1, line2, slug){
+  const head = document.getElementById("sheetHeader");
+  head.style.backgroundImage = `url('${IMG_URL}')`;
+  document.getElementById("mTitle").innerText = title;
+  document.getElementById("mLine1").innerHTML = line1;
+
+  // poin ringkas berdasarkan role
+  const bullets = {
+    "Admin":[
+      "Pantau pelanggaran & report cepat",
+      "Gunakan <b>mod</b> untuk tugas moderasi",
+      "Lacak player mencurigakan dengan <b>track</b>",
+      "Command tersedia /nick,/invis,/mod,/track,/pullall,banall dll"
+    ],
+    "Staff":[
+      "Menjawab pertanyaan pemain",
+      "Menulis pengumuman/info penting",
+      "Membantu jalankan mini event",
+      "Unli find 70% dan command di role sebelumnya"
+    ],
+    "Co Owner":[
+      "Akses Co owner untuk administrasi penuh",
+      "full akses dari command /find dengan unlimited item",
+      "command yang tersedia command role sebelumnya ,/f,/find/gsm dan lain lain, juga kamu bisa cari tau dengan /?"
+    ]
+  };
+
+  const ul = document.getElementById("mBullets");
+  ul.innerHTML = "";
+  (bullets[roleKey] || []).forEach(li=>{
+    const item = document.createElement("li");
+    item.innerHTML = li;
+    ul.appendChild(item);
+  });
+
+  document.getElementById("mLine2").innerHTML = line2;
+
+  // Link WhatsApp
+  const wa = `https://wa.me/${WA_NUMBER}?text=${WA_TEXT(title)}`;
+  const buy = document.getElementById("buyLink");
+  buy.href = wa;
+  buy.textContent = "Beli Sekarang via WhatsApp";
+
+  document.getElementById("modal").classList.add("show");
+}
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+</script>
+</body>
+</html>
